@@ -1,0 +1,61 @@
+modules:
+  sql:
+   - key: main
+     engine: mysql
+  scheduledTrigger:
+   - key: trace-db-migration
+     function: runMigration
+     interval: hour
+  trigger:
+   - key: trace-db-migration-lifecycle
+     function: runMigration
+     events:
+      - avi:forge:installed:app
+      - avi:forge:upgraded:app
+  jira:issueContext:
+   - key: trace-issue-context
+     resource: issue-context
+     resolver:
+       function: resolver
+     render: native
+     title: Trace
+     description: A Jira issue context panel for the Trace app.
+     icon: resource:icons;book-with-bookmark.svg
+     label: Resources linked to this jira issue
+  confluence:contentBylineItem:
+   - key: trace-byline-item
+     resource: byline-item
+     resolver:
+       function: resolver
+     render: native
+     title: Trace
+     description: Shows Jira issues linked to this documentation page
+     icon: resource:icons;book-with-bookmark.svg
+  function:
+   - key: resolver
+     handler: resolver/index.handler
+   - key: runMigration
+     handler: migrations/index.runMigration
+resources:
+  - key: issue-context
+    path: src/frontend/issue-context.jsx
+  - key: byline-item
+    path: src/frontend/byline-item.jsx
+  - key: icons
+    path: src/frontend/assets/icons
+permissions:
+  scopes:
+    - read:confluence-content.summary
+    - search:confluence
+    - read:jira-work
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/12fe84ff-6343-42f8-a5bb-5503489ab142
+  compatibility:
+    jira:
+      required: true
+    confluence:
+      required: false
