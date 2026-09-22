@@ -1,154 +1,60 @@
 # Trace
 
-**Keep Jira delivery and Confluence documentation in step.**
+**Keep your documentation up to date as your product evolves.**
 
-Trace links Jira issues to the Confluence pages they affect, and tracks whether the
-documentation actually got written.
-
-- [The problem](#the-problem)
-- [What Trace does](#what-trace-does)
-- [The two surfaces](#the-two-surfaces)
-- [The documentation workflow](#the-documentation-workflow)
-- [A typical flow](#a-typical-flow)
-- [Requirements](#requirements)
-- [Privacy and data](#privacy-and-data)
-- [Licence and contributing](#licence-and-contributing)
-- [Getting started](#getting-started) *(developers)*
-- [Architecture](#architecture)
-- [Modules and storage](#modules-and-storage)
-- [Resolver surface](#resolver-surface)
-- [Quality gates](#quality-gates)
-- [Deploying](#deploying)
-- [Permissions](#permissions)
-
-## The problem
-
-Documentation drifts out of date, and nobody notices until someone is misled by it.
-
-The reason is rarely laziness. It is that nothing connects the work to the docs. An issue gets
-delivered, the page that describes that behaviour is now subtly wrong, and there is no record
-anywhere that says "this page needed updating because of this issue". Jira's own Confluence
-links are a flat list of URLs: they tell you a page is *related*, not whether anyone has done
-anything about it.
-
-Trace adds the missing piece — a **status** on the relationship itself, and a record of who
-moved it.
-
-## What Trace does
-
-Trace lets anyone working on an issue say "this issue affects that page", then track the
-documentation work as a small workflow, from both Jira and Confluence.
-
-| Feature | What it gives you |
-| --- | --- |
-| **Two-way linking** | Link an issue to a Confluence page or blog post from the issue, and see the issues attached to a page from the page. |
-| **A documentation status per link** | Each link carries its own status, so one issue can have a documented page and an outstanding one. |
-| **Search-based content picker** | Find pages and blog posts by title from inside the issue — no copying URLs. |
-| **Audit trail** | Every status change records who made it and when, and the trail survives unlinking. |
-| **Page-version awareness** | Trace records the page version at each status change, so a page edited after being marked `done` is visible as such. |
-| **Permission-aware by construction** | Everything is read as *you*, so Trace never reveals an issue or page you could not already open. |
-| **Automatic cleanup** | Delete a page or an issue and its links quietly retire, while the history is preserved for auditing. |
-
-## The two surfaces
-
-### Jira: the issue context panel
-
-<!-- screenshot: Jira issue context panel showing linked Confluence pages -->
-
-Opens in the context panel of any Jira issue, under the heading **Trace**.
-
-From here you can search Confluence for a page or blog post and link it to the issue, see
-everything already linked with its current documentation status, and unlink anything that turned
-out to be irrelevant. It answers the question a developer asks while closing an issue: *what do
-I need to go and document?*
-
-### Confluence: the byline item
-
-<!-- screenshot: Confluence byline item showing linked Jira issues and their statuses -->
-
-Appears in the byline of any page or blog post, next to the author and last-modified date.
-
-It lists the Jira issues linked to that page and each link's documentation status, lets you move
-a status along the workflow, and lets you drill into the full transition history for any link.
-It answers the question a technical writer or reviewer asks while reading a page: *is this page
-still accurate, and who last confirmed it?*
-
-## The documentation workflow
-
-Each link moves through five statuses. Transitions are enforced by the app, not merely suggested
-by the interface, so the history stays meaningful.
-
-| Status | Meaning |
-| --- | --- |
-| `not_started` | The link exists; nobody has picked up the documentation yet. Every new link starts here. |
-| `ongoing_work` | Someone is actively writing or updating the page for this issue. |
-| `needs_review` | The writing is done and is waiting for someone else to check it. |
-| `needs_rework` | A reviewer looked and sent it back with changes needed. |
-| `done` | The documentation is complete and accepted. Terminal — the link is closed. |
-
-Permitted transitions:
-
-| From | Can move to |
-| -------------- | -------------------------- |
-| `not_started`  | `ongoing_work`             |
-| `ongoing_work` | `needs_review`, `done`     |
-| `needs_review` | `needs_rework`, `done`     |
-| `needs_rework` | `done`, `ongoing_work`     |
-| `done`         | (terminal)                 |
-
-## A typical flow
-
-1. A developer picks up `TRACE-42` and realises it changes behaviour described on the *Billing
-   rules* page. From the issue's Trace panel, they search for the page and link it. The link
-   starts at `not_started`.
-2. The issue ships. A technical writer opens *Billing rules*, sees `TRACE-42` sitting in the
-   byline at `not_started`, and moves it to `ongoing_work` before editing.
-3. With the page rewritten, they move the link to `needs_review`.
-4. A reviewer reads the page. Something is missing, so they move it to `needs_rework` — which is
-   recorded against their name and the page version they read.
-5. The writer fixes it and the reviewer moves the link to `done`. The page now shows a closed
-   link, and the history records every step and everyone involved.
-
-If someone edits the page afterwards, the recorded version no longer matches the current one —
-a signal that the "done" may be worth revisiting.
-
-## Requirements
-
-- An **Atlassian Cloud** site. Trace is a Forge app and runs only on Cloud.
-- **Jira is required.** The Jira issue context panel is the primary surface.
-- **Confluence is optional but strongly recommended.** Without it, there is nothing to link to
-  and the byline item never appears.
-- Install the app into **both products** to get both surfaces — installing into Jira alone does
-  not add the Confluence byline item.
-
-## Privacy and data
-
-Trace stores only the links themselves: the Confluence content ID, the Jira issue key, the
-status, timestamps, and the Atlassian account ID of whoever made each status change. It stores
-no page content, no issue content, and no names or email addresses — those are fetched live from
-Jira and Confluence at render time and discarded.
-
-All of it lives in a Forge SQL database **hosted and operated by Atlassian**. There are no
-external servers, no analytics and no telemetry. See [PRIVACY.md](PRIVACY.md) for the full
-policy.
-
-## Licence and contributing
-
-Trace is **source-available**, not open source, under the
-[PolyForm Perimeter License 1.0.1](LICENSE). You may use, modify, fork and self-host it for any
-purpose — including commercially inside your own organisation — but not to provide others with a
-product that competes with Trace.
-
-Contributions are welcome. Note that pull requests carry an explicit grant of rights to the
-maintainer; see [CONTRIBUTING.md](CONTRIBUTING.md) before opening one.
+Trace connects Jira issues to Confluence pages and tracks whether the documentation has been updated to match. It answers a simple question: when something changes in your product, which documentation pages need updating, and has anyone done it yet?
 
 ---
 
-# Developer documentation
+**Quick links:**
+- [Licence and Contributing](CONTRIBUTING.md)
+- [Privacy Policy](PRIVACY.md)
+- [Developer Setup](#for-developers)
 
-Everything below is for people working on Trace itself. It ships two UI modules — a Jira issue
-context panel and a Confluence byline item — over links and transition history stored in Forge
-SQL, so the data belongs to the app rather than to any one issue or page.
+---
+
+## The Problem
+
+When a feature ships, the documentation it affects often sits unchanged until someone—or no one—remembers to update it. By then, users are frustrated or making wrong assumptions.
+
+Trace fixes this by linking the work directly to the docs and tracking progress through a simple status workflow. So nothing slips through the cracks.
+
+## How It Works
+
+### In Jira
+When you close an issue, Trace lets you link it to any Confluence page that needs documentation updates. You can search for pages right from the issue.
+
+### In Confluence
+When you read a page, Trace shows you all the Jira issues linked to it—and whether each one has been documented yet. You can update the status as you work.
+
+### The Workflow
+Each link has a simple status:
+- **Not started** — someone needs to update the docs
+- **Ongoing** — someone is working on it now
+- **Needs review** — it's ready for someone else to check
+- **Needs rework** — the reviewer wants changes
+- **Done** — it's finished and approved
+
+Trace records who moved the status forward and when, so you have a complete audit trail.
+
+## What You Need
+
+- An Atlassian Cloud site (Jira and/or Confluence)
+- Jira (required) + Confluence (recommended—otherwise there's nothing to link to)
+
+## Privacy
+
+Trace stores only links, their status, and who changed them. No page content, no issue content, no personal data beyond the user account ID that's already in Atlassian. Everything is hosted by Atlassian in their data centers. No external servers, no analytics, no tracking. See [PRIVACY.md](PRIVACY.md) for details.
+
+## Licence
+
+Trace is source-available under the [PolyForm Perimeter License](LICENSE). You can use, modify, fork and self-host it freely—including in commercial environments—but you can't use it to build a competing product. If you want to contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+# For Developers
+
+Everything below is technical documentation for developers building or extending Trace.
 
 ## Getting started
 
