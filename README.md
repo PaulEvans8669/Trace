@@ -7,6 +7,7 @@ Trace connects Jira issues to Confluence pages and tracks whether the documentat
 ---
 
 **Quick links:**
+- [Terms of Service](TERMS.md)
 - [Licence and Contributing](CONTRIBUTING.md)
 - [Privacy Policy](PRIVACY.md)
 - [Developer Setup](#for-developers)
