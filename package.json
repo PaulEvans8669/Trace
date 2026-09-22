@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Forge app linking Jira issues to Confluence pages with documentation status tracking.",
   "main": "index.js",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "scripts": {
     "lint": "eslint \"src/**/*.{ts,tsx}\" || npm run --silent hook-errors",
