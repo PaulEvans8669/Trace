@@ -1,0 +1,41 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint_typecheck_test:
+    name: Lint, Typecheck, Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      # Coverage is informational only: `continue-on-error` plus the absence of
+      # coverage thresholds in vitest.config.ts means it can never fail the gate.
+      - name: Coverage summary
+        if: always()
+        continue-on-error: true
+        run: node scripts/coverage-summary.js

@@ -2,16 +2,24 @@ modules:
   sql:
    - key: main
      engine: mysql
-  scheduledTrigger:
-   - key: trace-db-migration
-     function: runMigration
-     interval: hour
   trigger:
    - key: trace-db-migration-lifecycle
      function: runMigration
      events:
       - avi:forge:installed:app
       - avi:forge:upgraded:app
+   # Deleting a page or an issue would otherwise orphan its link rows forever: the permission
+   # filter hides them from every panel, but they stay in storage and are re-read on each load.
+   # These triggers soft-unlink them, preserving the transition history for auditing.
+   - key: trace-cleanup-deleted-content
+     function: onContentDeleted
+     events:
+      - avi:confluence:removed:page
+      - avi:confluence:removed:blogpost
+   - key: trace-cleanup-deleted-issue
+     function: onIssueDeleted
+     events:
+      - avi:jira:deleted:issue
   jira:issueContext:
    - key: trace-issue-context
      resource: issue-context
@@ -31,21 +39,30 @@ modules:
      title: Trace
      description: Shows Jira issues linked to this documentation page
      icon: resource:icons;book-with-bookmark.svg
+     viewportSize: large
   function:
    - key: resolver
      handler: resolver/index.handler
    - key: runMigration
      handler: migrations/index.runMigration
+   - key: onContentDeleted
+     handler: triggers/cleanup.onContentDeleted
+   - key: onIssueDeleted
+     handler: triggers/cleanup.onIssueDeleted
 resources:
   - key: issue-context
-    path: src/frontend/issue-context.jsx
+    path: src/frontend/issue-context.tsx
   - key: byline-item
-    path: src/frontend/byline-item.jsx
+    path: src/frontend/byline-item.tsx
   - key: icons
     path: src/frontend/assets/icons
 permissions:
   scopes:
     - read:confluence-content.summary
+    - read:page:confluence
+    # Blog posts are served from their own v2 collection (/wiki/api/v2/blogposts/{id}), which
+    # the visibility and version probes call directly.
+    - read:blogpost:confluence
     - search:confluence
     - read:jira-work
 app:

@@ -1,6 +1,35 @@
+# Dependencies. package-lock.json is deliberately NOT ignored - the lockfile is
+# committed so CI and Forge deploys resolve the exact same dependency tree.
 /node_modules/
-/dist/
-/.vscode/
-.idea
 
+# Build output
+/dist/
+*.tsbuildinfo
+
+# Forge CLI local state (app id cache, tunnel state, logs)
 /.forge/
+
+# Secrets and environment. Never commit a real token; FORGE_TOKEN belongs in
+# GitHub Actions secrets, and forge login credentials live outside the repo.
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Test and coverage output
+/coverage/
+
+# Tool caches
+.eslintcache
+
+# Editors
+/.idea/
+/.vscode/
+
+# OS cruft
+.DS_Store
+Thumbs.db
