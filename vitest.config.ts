@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: 'jsdom',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     coverage: {
       // The v8 provider uses Node's built-in coverage, so there is no extra
